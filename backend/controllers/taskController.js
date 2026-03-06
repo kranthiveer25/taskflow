@@ -34,5 +34,20 @@ const createTask = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+// @desc    Get all tasks
+// @route   GET /api/tasks
+const getTasks = async (req, res) => {
+    try {
+      const tasks = await Task.find()
+        .populate('assignedTo', 'name email')
+        .populate('createdBy', 'name email')
+        .populate('team', 'name');
+  
+      res.status(200).json({ tasks });
+  
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
 
-module.exports = { createTask };
+  module.exports = { createTask, getTasks };

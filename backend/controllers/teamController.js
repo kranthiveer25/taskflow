@@ -73,5 +73,25 @@ const getTeams = async (req, res) => {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   };
+  const getTeamMembers = async (req, res) => {
+    try {
+      const { teamId } = req.params;
+  
+      // Check if team exists
+      const team = await Team.findById(teamId);
+      if (!team) {
+        return res.status(404).json({ message: 'Team not found' });
+      }
+  
+      // Get all members with user details
+      const members = await TeamMember.find({ team: teamId })
+        .populate('user', 'name email role');
+  
+      res.status(200).json({ members });
+  
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
 
-  module.exports = { createTeam, addMember, getTeams };
+  module.exports = { createTeam, addMember, getTeams, getTeamMembers };

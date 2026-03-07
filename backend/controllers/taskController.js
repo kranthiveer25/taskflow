@@ -1,3 +1,4 @@
+const logActivity = require('../utils/activityLogger');
 const Task = require('../models/Task');
 const TeamMember = require('../models/TeamMember');
 
@@ -26,6 +27,7 @@ const createTask = async (req, res) => {
       createdBy: req.user._id,
       status: 'pending'
     });
+    await logActivity(req.user._id, task._id, 'Task created');
 
     res.status(201).json({ message: 'Task created successfully', task });
 
@@ -75,6 +77,7 @@ const updateTaskStatus = async (req, res) => {
   
       task.status = status;
       await task.save();
+      await logActivity(req.user._id, task._id, `Status updated to ${status}`);
   
       res.status(200).json({ message: 'Task status updated', task });
   

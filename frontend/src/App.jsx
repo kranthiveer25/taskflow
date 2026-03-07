@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Comments from './pages/Comments';
 import ActivityLog from './pages/ActivityLog';
+import Upload from './pages/Upload';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/comments/:taskId" element={<Comments />} />
         <Route path="/activity" element={<ActivityLog />} />
+        <Route path="/upload/:taskId" element={<Upload />} />
       </Routes>
     </BrowserRouter>
   );

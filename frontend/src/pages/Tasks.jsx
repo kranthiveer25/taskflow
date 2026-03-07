@@ -169,21 +169,32 @@ function Tasks() {
                   );
                 })()}
 
-                {/* Comments Button */}
-                <button
-                  onClick={() => navigate(`/comments/${task._id}`)}
-                  style={{
-                    fontSize: '0.75rem', padding: '4px 8px',
-                    cursor: 'pointer', background: '#1976d2',
-                    color: 'white', border: 'none', borderRadius: '4px',
-                    marginBottom: '6px', marginTop: '8px'
-                  }}
-                >
-                  💬 Comments
-                </button>
+                {/* Action Buttons */}
+                <div style={{ marginTop: '8px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => navigate(`/comments/${task._id}`)}
+                    style={{
+                      fontSize: '0.75rem', padding: '4px 8px',
+                      cursor: 'pointer', background: '#1976d2',
+                      color: 'white', border: 'none', borderRadius: '4px'
+                    }}
+                  >
+                    💬 Comments
+                  </button>
+                  <button
+                    onClick={() => navigate(`/upload/${task._id}`)}
+                    style={{
+                      fontSize: '0.75rem', padding: '4px 8px',
+                      cursor: 'pointer', background: '#388e3c',
+                      color: 'white', border: 'none', borderRadius: '4px'
+                    }}
+                  >
+                    📎 Upload
+                  </button>
+                </div>
 
                 {/* Move to buttons */}
-                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                <div style={{ marginTop: '6px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   {columns.filter(c => c !== col).map((c) => (
                     <button
                       key={c}

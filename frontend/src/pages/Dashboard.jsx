@@ -47,6 +47,9 @@ function Dashboard() {
       <button onClick={() => navigate('/tasks')} style={{ padding: '8px 16px', marginBottom: '20px' }}>
         📋 View Task Board
       </button>
+      <button onClick={() => navigate('/activity')} style={{ padding: '8px 16px', marginBottom: '20px', marginLeft: '10px' }}>
+  📜 Activity Log
+</button>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 

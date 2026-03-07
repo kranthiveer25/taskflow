@@ -83,4 +83,27 @@ const updateTaskStatus = async (req, res) => {
     }
   };
 
-  module.exports = { createTask, getTasks, updateTaskStatus };
+const deleteTask = async (req, res) => {
+    try {
+      const { taskId } = req.params;
+  
+      const task = await Task.findById(taskId);
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+  
+      // Only team leader or admin can delete tasks
+      const isLeader = req.user.role === 'teamleader' || req.user.role === 'admin';
+      if (!isLeader) {
+        return res.status(403).json({ message: 'Not authorized to delete this task' });
+      }
+  
+      await task.deleteOne();
+  
+      res.status(200).json({ message: 'Task deleted successfully' });
+  
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
+  module.exports = { createTask, getTasks, updateTaskStatus, deleteTask };

@@ -6,11 +6,9 @@ function Dashboard() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
-    // If not logged in, redirect to login
     if (!user) {
       navigate('/');
       return;
@@ -20,7 +18,6 @@ function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      // Team leaders and admins see admin dashboard
       const isAdmin = user.role === 'admin' || user.role === 'teamleader';
       const endpoint = isAdmin ? '/dashboard/admin' : '/dashboard/user';
       const res = await API.get(endpoint);
@@ -46,6 +43,10 @@ function Dashboard() {
       </div>
 
       <p>Role: <strong>{user.role}</strong></p>
+
+      <button onClick={() => navigate('/tasks')} style={{ padding: '8px 16px', marginBottom: '20px' }}>
+        📋 View Task Board
+      </button>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 

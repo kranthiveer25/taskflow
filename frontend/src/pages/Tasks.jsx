@@ -4,6 +4,8 @@ import API from '../api/axios';
 
 function Tasks() {
   const [tasks, setTasks] = useState([]);
+  const [keyword, setKeyword] = useState('');
+  const [priority, setPriority] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
@@ -22,10 +24,28 @@ function Tasks() {
     }
   };
 
+  const handleSearch = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (keyword) params.append('keyword', keyword);
+      if (priority) params.append('priority', priority);
+      const res = await API.get(`/tasks/search?${params.toString()}`);
+      setTasks(res.data.tasks);
+    } catch (err) {
+      setError('Search failed');
+    }
+  };
+
+  const handleReset = () => {
+    setKeyword('');
+    setPriority('');
+    fetchTasks();
+  };
+
   const updateStatus = async (taskId, newStatus) => {
     try {
       await API.patch(`/tasks/${taskId}/status`, { status: newStatus });
-      fetchTasks(); // refresh
+      fetchTasks();
     } catch (err) {
       alert('Failed to update status');
     }
@@ -52,9 +72,47 @@ function Tasks() {
         </button>
       </div>
 
+      {/* Filter Bar */}
+      <div style={{
+        display: 'flex', gap: '10px', marginBottom: '20px',
+        padding: '16px', background: '#f5f5f5', borderRadius: '8px',
+        flexWrap: 'wrap', alignItems: 'center'
+      }}>
+        <input
+          type="text"
+          placeholder="🔍 Search tasks..."
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd', minWidth: '200px' }}
+        />
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+        >
+          <option value="">All Priorities</option>
+          <option value="high">🔴 High</option>
+          <option value="medium">🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <button
+          onClick={handleSearch}
+          style={{ padding: '8px 16px', background: '#1976d2', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+        >
+          Search
+        </button>
+        <button
+          onClick={handleReset}
+          style={{ padding: '8px 16px', background: '#888', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+        >
+          Reset
+        </button>
+      </div>
+
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
+      {/* Kanban Columns */}
+      <div style={{ display: 'flex', gap: '20px' }}>
         {columns.map((col) => (
           <div key={col} style={{
             flex: 1,
@@ -86,8 +144,6 @@ function Tasks() {
                 <p style={{ fontSize: '0.8rem', margin: '4px 0' }}>
                   🎯 Priority: <strong>{task.priority}</strong>
                 </p>
-
-                {/* Status buttons */}
                 <div style={{ marginTop: '8px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   {columns.filter(c => c !== col).map((c) => (
                     <button

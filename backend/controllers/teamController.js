@@ -30,7 +30,7 @@ const createTeam = async (req, res) => {
 
 const addMember = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { email } = req.body;
     const { teamId } = req.params;
 
     const team = await Team.findById(teamId);
@@ -42,20 +42,19 @@ const addMember = async (req, res) => {
       return res.status(403).json({ message: 'Only team leader can add members' });
     }
 
-    const user = await User.findById(userId);
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const existingMember = await TeamMember.findOne({ team: teamId, user: userId });
+    const existingMember = await TeamMember.findOne({ team: teamId, user: user._id });
     if (existingMember) {
       return res.status(400).json({ message: 'User is already a team member' });
     }
 
-    await TeamMember.create({ team: teamId, user: userId });
-
+    await TeamMember.create({ team: teamId, user: user._id });
     res.status(201).json({ message: 'Member added successfully' });
-
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

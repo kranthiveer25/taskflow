@@ -4,6 +4,7 @@ require('./models/TeamMember');
 require('./models/Task');
 require('./models/Comment');
 require('./models/ActivityLog');
+require('./models/TaskFile');
 
 const express = require('express');
 const dotenv = require('dotenv');

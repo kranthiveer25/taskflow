@@ -1,4 +1,4 @@
-import { Leaf, Heart } from 'lucide-react';
+import { Leaf, Mail, Phone } from 'lucide-react';
 
 function Footer() {
   return (
@@ -9,8 +9,18 @@ function Footer() {
           <span className="footer-brand">TaskFlow</span>
         </div>
         <span className="footer-text">
-          Developed with <Heart size={13} color="#a5d6a7" fill="#a5d6a7" style={{ display: 'inline', verticalAlign: 'middle', margin: '0 3px' }} /> by <strong>K. KRANTHI VEER</strong>
+          Developed by <strong>K. KRANTHI VEER</strong>
         </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <span className="footer-contact">
+            <Mail size={13} style={{ verticalAlign: 'middle', marginRight: '5px' }} />
+            kranthiveer.kammari19@gmail.com
+          </span>
+          <span className="footer-contact">
+            <Phone size={13} style={{ verticalAlign: 'middle', marginRight: '5px' }} />
+            +91 7780690478
+          </span>
+        </div>
         <span className="footer-copy">© {new Date().getFullYear()} All rights reserved.</span>
       </div>
     </footer>

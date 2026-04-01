@@ -25,5 +25,10 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// Indexes for performance optimization
+userSchema.index({ email: 1 });        // fast login lookup
+userSchema.index({ role: 1 });         // filter by role (admin/teamleader/member)
+userSchema.index({ name: 1 });         // search by name
+userSchema.index({ createdAt: -1 });   // sort by newest
 
 module.exports = mongoose.model('User', userSchema);

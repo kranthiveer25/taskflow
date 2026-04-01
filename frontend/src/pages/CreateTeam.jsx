@@ -4,27 +4,43 @@ import { Users, ArrowLeft } from 'lucide-react';
 import API from '../api/axios';
 
 function CreateTeam() {
-  const [name, setName] = useState('');
+  const [name, setName]               = useState('');
   const [description, setDescription] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [errors, setErrors]           = useState({});
+  const [touched, setTouched]         = useState({});
+  const [serverError, setServerError] = useState('');
+  const [success, setSuccess]         = useState('');
+  const [loading, setLoading]         = useState(false);
   const navigate = useNavigate();
+
+  const validate = (n, d) => {
+    const errs = {};
+    if (!n.trim())                 errs.name        = 'Team name is required';
+    else if (n.trim().length < 2)  errs.name        = 'Team name must be at least 2 characters';
+    else if (n.trim().length > 50) errs.name        = 'Team name must be under 50 characters';
+    if (d.length > 200)            errs.description = 'Description must be under 200 characters';
+    return errs;
+  };
+
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    setErrors(validate(name, description));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) {
-      setError('Team name is required');
-      return;
-    }
+    setTouched({ name: true, description: true });
+    const errs = validate(name, description);
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     try {
       setLoading(true);
-      setError('');
+      setServerError('');
       await API.post('/teams', { name, description });
       setSuccess('Team created successfully!');
       setTimeout(() => navigate('/teams'), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create team');
+      setServerError(err.response?.data?.message || 'Failed to create team');
     } finally {
       setLoading(false);
     }
@@ -56,12 +72,9 @@ function CreateTeam() {
           </p>
         </div>
 
-        {error && (
-          <p style={{
-            background: '#ffebee', color: '#c62828', padding: '10px',
-            borderRadius: '6px', marginBottom: '16px', fontSize: '0.9rem'
-          }}>
-            {error}
+        {serverError && (
+          <p style={{ background: '#ffebee', color: '#c62828', padding: '10px', borderRadius: '6px', marginBottom: '16px', fontSize: '0.9rem' }}>
+            {serverError}
           </p>
         )}
         {success && (
@@ -74,7 +87,7 @@ function CreateTeam() {
           </p>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div style={{ marginBottom: '18px' }}>
             <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: '#444' }}>
               Team Name *
@@ -82,11 +95,15 @@ function CreateTeam() {
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => { setName(e.target.value); if (touched.name) setErrors(validate(e.target.value, description)); }}
+              onBlur={() => handleBlur('name')}
               placeholder="e.g. Dev Team, Design Squad..."
-              style={{ width: '100%' }}
-              required
+              style={{ width: '100%', borderColor: touched.name && errors.name ? '#e53935' : undefined }}
             />
+            {touched.name && errors.name && (
+              <p style={{ color: '#e53935', fontSize: '0.8rem', marginTop: '4px' }}>⚠ {errors.name}</p>
+            )}
+            <p style={{ color: '#aaa', fontSize: '0.78rem', marginTop: '4px' }}>{name.length}/50 characters</p>
           </div>
 
           <div style={{ marginBottom: '24px' }}>
@@ -95,11 +112,16 @@ function CreateTeam() {
             </label>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => { setDescription(e.target.value); if (touched.description) setErrors(validate(name, e.target.value)); }}
+              onBlur={() => handleBlur('description')}
               placeholder="What does this team work on?"
               rows={3}
-              style={{ width: '100%', resize: 'vertical' }}
+              style={{ width: '100%', resize: 'vertical', borderColor: touched.description && errors.description ? '#e53935' : undefined }}
             />
+            {touched.description && errors.description && (
+              <p style={{ color: '#e53935', fontSize: '0.8rem', marginTop: '4px' }}>⚠ {errors.description}</p>
+            )}
+            <p style={{ color: '#aaa', fontSize: '0.78rem', marginTop: '4px' }}>{description.length}/200 characters</p>
           </div>
 
           <button

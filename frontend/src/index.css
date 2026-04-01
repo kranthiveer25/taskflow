@@ -19,6 +19,9 @@ body {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 100;
 }
 
 .navbar h1 {
@@ -48,6 +51,86 @@ body {
 
 .navbar-user-icon {
   animation: userIconPulse 2s ease-in-out infinite;
+}
+
+/* Desktop nav - visible on large screens */
+.navbar-desktop {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Mobile right side: user tag + hamburger */
+.navbar-mobile-right {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Hamburger button */
+.hamburger-btn {
+  background: rgba(255,255,255,0.15) !important;
+  border: none !important;
+  padding: 6px 8px !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger-btn:hover {
+  background: rgba(255,255,255,0.25) !important;
+  transform: none !important;
+}
+
+/* Mobile dropdown menu */
+.mobile-menu {
+  width: 100%;
+  background: #1b5e20;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+.mobile-menu-item {
+  background: none !important;
+  border: none !important;
+  color: #c8e6c9 !important;
+  padding: 12px 24px !important;
+  text-align: left;
+  font-size: 0.95rem !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 0 !important;
+  transition: background 0.15s !important;
+}
+
+.mobile-menu-item:hover {
+  background: rgba(255,255,255,0.1) !important;
+  transform: none !important;
+  color: white !important;
+}
+
+.mobile-menu-danger {
+  color: #ffcdd2 !important;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* Responsive breakpoint */
+@media (max-width: 768px) {
+  .navbar-desktop {
+    display: none;
+  }
+  .navbar-mobile-right {
+    display: flex;
+  }
+  .navbar {
+    padding: 12px 16px;
+  }
 }
 
 /* Cards */
@@ -152,6 +235,207 @@ input:focus, select:focus, textarea:focus {
   padding: 24px;
 }
 
+/* User rows */
+.user-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  gap: 12px;
+}
+
+.user-row-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 540px) {
+  .user-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+  .user-row-right {
+    width: 100%;
+    justify-content: space-between;
+    padding-left: 52px; /* aligns under name, past the avatar */
+  }
+}
+
+/* Quote Carousel */
+.quote-carousel {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 28px;
+  box-shadow: 0 4px 16px rgba(46,125,50,0.09);
+  border: 1px solid #e8f5e9;
+  transition: opacity 0.6s ease;
+  min-height: 120px;
+}
+
+.quote-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.quote-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.quote-category {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.quote-text {
+  margin: 8px 0 16px;
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  font-style: italic;
+}
+
+.quote-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.quote-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  display: inline-block;
+}
+
+.quote-dot.active {
+  transform: scale(1.35);
+}
+
+@media (max-width: 540px) {
+  .quote-carousel {
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px;
+  }
+}
+
+/* CSIB Marquee */
+.csib-marquee-wrapper {
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #e8f5e9, #f1f8e9);
+  padding: 16px 0;
+  border: 1px solid #c8e6c9;
+  position: relative;
+}
+
+.csib-marquee-wrapper::before,
+.csib-marquee-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.csib-marquee-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, #e8f5e9, transparent);
+}
+
+.csib-marquee-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, #f1f8e9, transparent);
+}
+
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.csib-marquee-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  animation: marqueeScroll 28s linear infinite;
+  padding: 0 16px;
+}
+
+.csib-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.csib-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border-radius: 10px;
+  padding: 14px 20px;
+  min-width: 260px;
+  box-shadow: 0 2px 8px rgba(46,125,50,0.10);
+  border: 1px solid #e8f5e9;
+  text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.csib-card:hover {
+  box-shadow: 0 6px 18px rgba(46,125,50,0.18);
+  transform: translateY(-2px);
+}
+
+.csib-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2e7d32, #43a047);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.csib-card-text {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.csib-card-highlight {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.csib-card-sub {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
 /* Footer */
 .footer {
   background: linear-gradient(90deg, #2e7d32, #43a047);
@@ -186,6 +470,13 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 0.5px;
 }
 
+.footer-contact {
+  color: #c8e6c9;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+}
+
 .footer-copy {
   color: #a5d6a7;
   font-size: 0.82rem;
@@ -203,5 +494,22 @@ input:focus, select:focus, textarea:focus {
     flex-direction: column;
     text-align: center;
     gap: 6px;
+  }
+  .page {
+    padding: 16px 12px;
+  }
+  .stat-card {
+    min-width: unset;
+    width: 100%;
+  }
+  .card {
+    padding: 16px 12px;
+  }
+  .csib-card {
+    min-width: 220px;
+    padding: 12px 14px;
+  }
+  input, select, textarea {
+    font-size: 16px; /* prevents iOS zoom on focus */
   }
 }

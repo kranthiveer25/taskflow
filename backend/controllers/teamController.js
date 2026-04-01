@@ -93,4 +93,30 @@ const getTeams = async (req, res) => {
     }
   };
 
-  module.exports = { createTeam, addMember, getTeams, getTeamMembers };
+const removeMember = async (req, res) => {
+  try {
+    const { teamId, memberId } = req.params;
+
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ message: 'Team not found' });
+    }
+
+    if (team.leader.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only team leader can remove members' });
+    }
+
+    const member = await TeamMember.findById(memberId);
+    if (!member) {
+      return res.status(404).json({ message: 'Member not found' });
+    }
+
+    await TeamMember.findByIdAndDelete(memberId);
+    res.status(200).json({ message: 'Member removed successfully' });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+  module.exports = { createTeam, addMember, getTeams, getTeamMembers, removeMember };

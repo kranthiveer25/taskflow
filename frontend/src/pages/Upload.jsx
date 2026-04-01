@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Paperclip, ArrowLeft, FileText, Image, File } from 'lucide-react';
+import { Paperclip, ArrowLeft, FileText, Image, File, FolderOpen, X } from 'lucide-react';
 import API from '../api/axios';
 
 function Upload() {
   const { taskId } = useParams();
+  const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState('');
@@ -82,24 +83,63 @@ function Upload() {
           Allowed: JPEG, PNG, PDF, DOC, DOCX — Max 5MB
         </p>
 
-        <div style={{
-          padding: '30px', border: '2px dashed #a5d6a7',
-          borderRadius: '10px', textAlign: 'center',
-          background: '#f9fffe', marginBottom: '16px'
-        }}>
+        {/* Hidden native input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleFileChange}
+          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+          style={{ display: 'none' }}
+        />
+
+        {/* Custom drop zone */}
+        <div
+          onClick={() => fileInputRef.current.click()}
+          style={{
+            padding: '30px 20px', border: '2px dashed #a5d6a7',
+            borderRadius: '10px', textAlign: 'center',
+            background: '#f9fffe', marginBottom: '16px',
+            cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#2e7d32'; e.currentTarget.style.background = '#f1fdf3'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#a5d6a7'; e.currentTarget.style.background = '#f9fffe'; }}
+        >
           <Paperclip size={32} color="#a5d6a7" style={{ marginBottom: '10px' }} />
-          <p style={{ color: '#666', marginBottom: '10px' }}>Select a file to attach to this task</p>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-          />
-          {file && (
-            <p style={{ marginTop: '10px', color: '#2e7d32', fontWeight: '500' }}>
-              Selected: <strong>{file.name}</strong> ({formatSize(file.size)})
-            </p>
-          )}
+          <p style={{ color: '#666', marginBottom: '14px', fontSize: '0.9rem' }}>
+            Tap to select a file to attach
+          </p>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            background: 'linear-gradient(90deg, #2e7d32, #43a047)',
+            color: 'white', padding: '9px 20px', borderRadius: '8px',
+            fontSize: '0.9rem', fontWeight: '500', pointerEvents: 'none'
+          }}>
+            <FolderOpen size={16} /> Browse File
+          </span>
         </div>
+
+        {/* Selected file preview */}
+        {file && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 14px', background: '#e8f5e9', borderRadius: '8px',
+            border: '1px solid #a5d6a7', marginBottom: '16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+              {getFileIcon(file.name)}
+              <span style={{ fontWeight: '500', color: '#2e7d32', fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {file.name}
+              </span>
+              <span style={{ color: '#888', fontSize: '0.8rem', flexShrink: 0 }}>({formatSize(file.size)})</span>
+            </div>
+            <button
+              onClick={e => { e.stopPropagation(); setFile(null); fileInputRef.current.value = ''; }}
+              style={{ background: 'none', border: 'none', padding: '2px', color: '#888', cursor: 'pointer', flexShrink: 0 }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
 
         <button
           onClick={handleUpload}

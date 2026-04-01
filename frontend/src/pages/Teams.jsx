@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, UserPlus, Trash2 } from 'lucide-react';
+import { Users, Plus, UserPlus, Trash2, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import API from '../api/axios';
+
+const TEAMS_PER_PAGE = 4;
 
 function Teams() {
   const [teams, setTeams] = useState([]);
   const [members, setMembers] = useState({});
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const [addEmail, setAddEmail] = useState({});
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -70,6 +74,23 @@ function Teams() {
     }
   };
 
+  // Filter teams by name or description
+  const filteredTeams = teams.filter(t => {
+    const q = searchQuery.toLowerCase();
+    return (
+      t.name?.toLowerCase().includes(q) ||
+      t.description?.toLowerCase().includes(q)
+    );
+  });
+
+  const totalPages = Math.ceil(filteredTeams.length / TEAMS_PER_PAGE);
+  const paginatedTeams = filteredTeams.slice((page - 1) * TEAMS_PER_PAGE, page * TEAMS_PER_PAGE);
+
+  const handleSearch = (val) => {
+    setSearchQuery(val);
+    setPage(1); // reset to page 1 on new search
+  };
+
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
       <p style={{ color: '#2e7d32' }}>Loading teams...</p>
@@ -84,21 +105,62 @@ function Teams() {
         background: 'white', borderRadius: '12px', padding: '20px 24px',
         marginBottom: '24px', boxShadow: '0 4px 12px rgba(46,125,50,0.08)',
         borderLeft: '5px solid #43a047',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Users size={24} color="#2e7d32" />
-          <h2 style={{ color: '#2e7d32', margin: 0 }}>My Teams</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Users size={24} color="#2e7d32" />
+            <h2 style={{ color: '#2e7d32', margin: 0 }}>My Teams</h2>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {searchQuery && (
+              <span style={{
+                background: '#fff3e0', color: '#e65100', borderRadius: '20px',
+                padding: '4px 14px', fontSize: '0.85rem', fontWeight: '600'
+              }}>
+                {filteredTeams.length} of {teams.length} shown
+              </span>
+            )}
+            <span style={{
+              background: '#e8f5e9', color: '#2e7d32', borderRadius: '20px',
+              padding: '4px 14px', fontSize: '0.85rem', fontWeight: '600'
+            }}>
+              {teams.length} total
+            </span>
+            {isLeader && (
+              <button
+                onClick={() => navigate('/teams/create')}
+                className="btn-primary"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Plus size={16} /> Create Team
+              </button>
+            )}
+          </div>
         </div>
-        {isLeader && (
-          <button
-            onClick={() => navigate('/teams/create')}
-            className="btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <Plus size={16} /> Create Team
-          </button>
-        )}
+
+        {/* Search Bar */}
+        <div style={{ position: 'relative' }}>
+          <Search size={16} color="#888" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            placeholder="Search by team name or description..."
+            value={searchQuery}
+            onChange={e => handleSearch(e.target.value)}
+            style={{ width: '100%', paddingLeft: '36px', paddingRight: searchQuery ? '36px' : '12px' }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => handleSearch('')}
+              style={{
+                position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', padding: '2px', cursor: 'pointer',
+                color: '#aaa', display: 'flex', alignItems: 'center'
+              }}
+            >
+              <X size={15} />
+            </button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -112,7 +174,7 @@ function Teams() {
         </p>
       )}
 
-      {/* No teams */}
+      {/* No teams at all */}
       {teams.length === 0 && (
         <div className="card" style={{ textAlign: 'center', padding: '50px' }}>
           <Users size={48} color="#ccc" style={{ margin: '0 auto 16px' }} />
@@ -130,8 +192,19 @@ function Teams() {
         </div>
       )}
 
+      {/* No search results */}
+      {teams.length > 0 && filteredTeams.length === 0 && (
+        <div className="card" style={{ textAlign: 'center', padding: '40px' }}>
+          <Search size={36} color="#ccc" style={{ margin: '0 auto 12px' }} />
+          <p style={{ color: '#aaa' }}>No teams match "<strong>{searchQuery}</strong>"</p>
+          <button onClick={() => handleSearch('')} className="btn-secondary" style={{ marginTop: '12px' }}>
+            Clear Search
+          </button>
+        </div>
+      )}
+
       {/* Team Cards */}
-      {teams.map((team) => (
+      {paginatedTeams.map((team) => (
         <div key={team._id} className="card" style={{ marginBottom: '20px' }}>
 
           {/* Team Header */}
@@ -235,6 +308,31 @@ function Teams() {
           )}
         </div>
       ))}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
+          <button
+            onClick={() => setPage(p => p - 1)}
+            disabled={page === 1}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: page === 1 ? 0.4 : 1 }}
+          >
+            <ChevronLeft size={16} /> Prev
+          </button>
+          <span style={{ color: '#2e7d32', fontWeight: '600', fontSize: '0.9rem' }}>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={page === totalPages}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: page === totalPages ? 0.4 : 1 }}
+          >
+            Next <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
